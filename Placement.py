@@ -102,7 +102,7 @@ class Placement:
             if movedTiles[i] != None:
                 tileBag.addToDiscard(self.placements[i][:len(self.placements[i])-1])
                 self.placements[i][:len(self.placements[i])-1] = [None for _ in range(len(self.placements[i]))]
-        [tileBag.addToDiscard(item) for item in self.lossTiles if type(item) == Tile]
+        tileBag.addToDiscard([item for item in self.lossTiles if type(item) == Tile])
         self.lossTiles = []
         # self.reset()
     def addScoreloss(self, tiles):

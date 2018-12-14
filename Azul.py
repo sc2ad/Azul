@@ -280,6 +280,7 @@ def start_pygame():
     center.loc = [width/2 - center.width/2, height/2 - 3 * center.tileBuffer]
     setupFactoryLocations()
     setupPlacementLocations()
+    setupBoardLocations()
     event_loop()
 
 def setupFactoryLocations():
@@ -298,6 +299,14 @@ def setupPlacementLocations():
     for i in range(numPlacements):
         playerPlacements[i].loc = [int(delta * i + 0.5 * Placement.tileBuffer), y]
 
+def setupBoardLocations():
+    numBoards = len(playerBoards)
+
+    delta = width / numBoards
+    y = height - int(7.5 * Board.tileBuffer)
+    for i in range(numBoards):
+        playerBoards[i].loc = [int(delta * i + 8 * Board.tileBuffer), y]
+
 def draw():
     global target
     screen.fill((0,0,0))
@@ -307,6 +316,8 @@ def draw():
             f.draw(screen)
         for p in playerPlacements:
             p.draw(screen)
+        for b in playerBoards:
+            b.draw(screen)
     else:
         # This is where I would also upscale the target to be really big so it would be easy to select tiles
         target.draw(screen)
@@ -450,6 +461,13 @@ def event_loop():
                     elif type(target) == Placement:
                         target = None
                     elif target == center:
+                        target = None
+                    if target is None:
+                        for b in playerBoards:
+                            if b.rect.collidepoint(pos):
+                                target = b
+                                break
+                    elif type(target) == Board:
                         target = None
 
 if __name__ == "__main__":

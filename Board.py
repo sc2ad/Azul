@@ -1,5 +1,8 @@
 from Tile import Tile
+import pygame
+
 class Board:
+    tileBuffer = 25
     def __init__(self):
         self.board = []
         for i in range(5):
@@ -8,6 +11,8 @@ class Board:
                 o.append(None)
             self.board.append(o)
         # self.board = [[None] * 5] * 5
+        self.rect = None
+        self.loc = [0,0]
     def confirmReset(self):
         for row in self.board:
             for item in row:
@@ -61,6 +66,9 @@ class Board:
         """
         assert not tile in self.board[row], "The tile already is in the row!"
         self.board[row][getIndex(row, tile)] = tile
+        self.updateTileLocation(tile, row)
+    def updateTileLocation(self, tile, row):
+        tile.loc = [(row + 1) * self.tileBuffer + self.loc[0], (getIndex(row, tile) + 1) * self.tileBuffer + self.loc[1]]
     def completedRowCount(self):
         """Returns the completed number of rows of this board
         """
@@ -96,6 +104,19 @@ class Board:
             if c == 5:
                 out += 1
         return out
+    def draw(self, screen):
+        # I also want to draw the outlines of where each colored tile goes
+        try:
+            # One extra y-axis tile buffer for intentional throwaway
+            self.rect = pygame.Rect(self.loc[0], self.loc[1], 6 * self.tileBuffer, 6 * self.tileBuffer)
+            pygame.draw.rect(screen, (255,255,255), self.rect, 3)
+            for row in self.board:
+                for tile in row:
+                    if tile != None:
+                        tile.draw(screen)
+        except Exception:
+            # Pygame either doesn't exist or isn't set up properly.
+            print("Pygame not loaded, ignoring!")
 def getIndex(row, tile):
     """Finds the index to place the given tile, given the row.
     """
