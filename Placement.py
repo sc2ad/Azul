@@ -6,7 +6,7 @@ class Placement:
         self.placements = []
         self.reset()
         self.loss = 0
-        self.lossLen = 0
+        self.lossTiles = []
     def reset(self):
         self.placements = []
         for i in range(5):
@@ -90,16 +90,21 @@ class Placement:
             if movedTiles[i] != None:
                 tileBag.addToDiscard(self.placements[i][:len(self.placements[i])-1])
                 self.placements[i][:len(self.placements[i])-1] = [None for _ in range(len(self.placements[i]))]
+        [tileBag.addToDiscard(item) for item in self.lossTiles if type(item) == Tile]
+        self.lossTiles = []
         # self.reset()
-    def addScoreloss(self, lossLen):
-        self.lossLen += lossLen
-        self.loss = self.lossLen
-        if self.lossLen > 2:
+    def addScoreloss(self, tiles):
+        # Need to discard the tiles that are extra back into the bag after calculating the score adjustment!
+        # Otherwise the bag just loses tiles when players put them into the scoreloss zone
+        assert type(tiles) == list, "Must input a valid list of tiles for scoreloss!"
+        self.lossTiles.extend(tiles)
+        self.loss = len(self.lossTiles)
+        if len(self.lossTiles) > 2:
             self.loss += 1
-        if self.lossLen > 4:
+        if len(self.lossTiles) > 4:
             self.loss += 1
     def calculateScoreloss(self):
-        self.addScoreloss(0) # Confirms that the correct loss is calculated
+        self.addScoreloss([]) # Confirms that the correct loss is calculated
         return self.loss
     def __str__(self):
         out = ""

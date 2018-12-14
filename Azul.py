@@ -148,19 +148,23 @@ def takeTurn(player):
     displayPlacement(player)
     while len(takeFrom) != 0:
         print("Where would you like to place your "+str(len(takeFrom))+" "+str(takeFrom[0])+" tiles?")
-        inp = input("Location on placement mat: ")
         if not playerPlacements[player].possiblePlacemat(takeFrom):
             # Need to add -1 points and stuff!
-            playerPlacements[player].addScoreloss(len(takeFrom))
+            playerPlacements[player].addScoreloss(takeFrom)
             print("You know have " + str(playerPlacements[player].calculateScoreloss()) + " negative points this round.")
             return
+        inp = input("Location on placement mat: ")
         try:
             inpu = int(inp)
-            if not 5 > inpu >= 0:
+            if not 5 > inpu >= -1:
                 # invalid input!
-                print("Please enter a number from 0-4")
+                print("Please enter a number from -1-4")
                 continue
             try:
+                if inpu == -1:
+                    playerPlacements[player].addScoreloss(takeFrom)
+                    print("You know have " + str(playerPlacements[player].calculateScoreloss()) + " negative points this round.")
+                    return
                 takeFrom = playerPlacements[player].addTiles(takeFrom, inpu)
 
             except AssertionError:
@@ -168,32 +172,36 @@ def takeTurn(player):
                 continue
 
         except:
-            print("Please enter a number from 0-4")
+            if inp.lower() == "q":
+                takeTurn(player)
+                return
+            print("Please enter a number from -1-4")
         
 def takeAITurn(player):
     # Also include inputs of factories and center (possibly Bag?)
-
+    AI.takeTurn(player, playerBoards, playerPlacements, scores, factories, center)
     chosenTiles = AI.getChosenTiles(player, playerBoards, playerPlacements, scores, factories, center)
     while len(chosenTiles) != 0:
         if not playerPlacements[player].possiblePlacemat(chosenTiles):
             # Need to add -1 points and stuff!
-            playerPlacements[player].addScoreloss(len(chosenTiles))
+            playerPlacements[player].addScoreloss(chosenTiles)
             return
-        chosenLocation = AI.getChosenLocation(player, playerBoards, playerPlacements, scores)
-        playerPlacements[player].addTiles(chosenTiles)
+        chosenLocation = AI.getChosenLocation(player, chosenTiles, playerBoards, playerPlacements, scores)
+        playerPlacements[player].addTiles(chosenTiles, chosenLocation)
 
 def playRound():
     roundStart()
     activePlayer = center.startingPlayer
     while len(center.tiles) != 0 or not factoriesEmpty():
         if activePlayer != 0:
-            takeAITurn(activePlayer)
+            # takeAITurn(activePlayer)
+            takeTurn(activePlayer)
         else:
             takeTurn(activePlayer)
         activePlayer = (activePlayer + 1) % len(playerBoards)
     # The round is over now. Score everything and reset the round for the next round
     # scores[center.startingPlayer] -= 1
-    playerPlacements[center.startingPlayer].addScoreloss(1)
+    playerPlacements[center.startingPlayer].addScoreloss([1])
     for i in range(len(playerPlacements)):
         scores[i] -= playerPlacements[i].calculateScoreloss()
         tiles = playerPlacements[i].moveTiles()
