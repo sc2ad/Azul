@@ -1,12 +1,18 @@
 from Tile import Tile
 from Board import Board
 from TileBag import TileBag
+
+import pygame
+
 class Placement:
+    tileBuffer = 25
     def __init__(self):
         self.placements = []
         self.reset()
         self.loss = 0
         self.lossTiles = []
+        self.loc = [0,0]
+        self.rect = None
     def reset(self):
         self.placements = []
         for i in range(5):
@@ -37,6 +43,12 @@ class Placement:
                 if self.placements[row][i] == None:
                     self.placements[row][i] = tile
                     break
+        for r in range(len(self.placements)):
+            for i in range(len(self.placements[r])):
+                if self.placements[r][i] != None:
+                    x = (i + 1) * self.tileBuffer + self.loc[0]
+                    y = (r + 1) * self.tileBuffer + self.loc[1]
+                    self.placements[r][i].loc = [x,y]
     def possiblePlacemat(self, tiles):
         """Tests to make sure that tiles can be placed within this placemat.
         Returns True if ANY tiles can be placed, False otherwise.
@@ -98,6 +110,9 @@ class Placement:
         # Otherwise the bag just loses tiles when players put them into the scoreloss zone
         assert type(tiles) == list, "Must input a valid list of tiles for scoreloss!"
         self.lossTiles.extend(tiles)
+        if type(self.lossTiles) != list:
+            # Edge case when the list has one item
+            self.lossTiles = list(self.lossTiles)
         self.loss = len(self.lossTiles)
         if len(self.lossTiles) > 2:
             self.loss += 1
@@ -111,3 +126,24 @@ class Placement:
         for row in self.placements:
             out += "Row: "+str(row)+"\n"
         return out
+    def draw(self, screen):
+        try:
+            # One extra y-axis tile buffer for intentional throwaway
+            self.rect = pygame.Rect(self.loc[0], self.loc[1], 6 * self.tileBuffer, 7 * self.tileBuffer)
+            pygame.draw.rect(screen, (255,255,255), self.rect, 3)
+
+            # Displays helper lines for clicking
+
+            for row in range(len(self.placements) + 1):
+                low = (row + 1) * self.tileBuffer + self.loc[1] - Tile.width / 2
+                up = (row + 1) * self.tileBuffer + self.loc[1] + Tile.width / 2
+                pygame.draw.line(screen, (255,0,0), (self.loc[0] + 3, low), (self.loc[0] + 3, up), 5)
+
+            pygame.draw.line(screen, (255,255,255), [self.loc[0], self.loc[1] + 6 * self.tileBuffer - Tile.width / 2 - (self.tileBuffer - Tile.width) / 2], [self.loc[0] + 6 * self.tileBuffer, self.loc[1] + 6 * self.tileBuffer - Tile.width / 2 - (self.tileBuffer - Tile.width) / 2], 3)
+            for r in self.placements:
+                for t in r:
+                    if t != None:
+                        t.draw(screen)
+        except Exception:
+            # Pygame either doesn't exist or isn't set up properly.
+            print("Pygame not loaded, ignoring!")

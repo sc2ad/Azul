@@ -13,11 +13,11 @@ class TileBag:
         """
         out = []
         for i in range(count):
-            if len(self.discard) == 0:
-                # Completely out of tiles
-                # Just return as is
-                return out
             if len(self.bag) == 0:
+                if len(self.discard) == 0:
+                    # Completely out of tiles
+                    # Just return as is
+                    return out
                 self.addTiles(self.discard)
                 self.discard = []
             index = random.randint(0, len(self.bag)-1)

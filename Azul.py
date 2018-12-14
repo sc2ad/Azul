@@ -5,6 +5,13 @@ from Tile import *
 from Placement import Placement
 from TileBag import TileBag
 import AI
+import Util
+
+import math
+import sys
+import time
+import pygame
+from pygame.locals import *
 
 playerPlacements = []
 playerBoards = []
@@ -85,6 +92,8 @@ def getFactoryChoice(player):
             inpu = int(inp)
             if len(factories)-1 >= inpu >= 0 and len(factories[inpu].tiles) != 0:
                 break
+        except KeyboardInterrupt:
+            sys.exit(0)
         except:
             # continue
             if inp.lower().startswith('q'):
@@ -142,6 +151,8 @@ def takeTurn(player):
         elif inp.lower().startswith('help'):
             # Help show
             showInstructions(player)
+        elif inp.lower().startswith('q'):
+            sys.exit(0)
     # Now find out where the player wants to put the tiles they took.
     print("You have "+str(len(takeFrom))+" "+str(takeFrom[0])+" tiles!")
     print("Now you must place them on your placement mat.")
@@ -151,7 +162,7 @@ def takeTurn(player):
         if not playerPlacements[player].possiblePlacemat(takeFrom):
             # Need to add -1 points and stuff!
             playerPlacements[player].addScoreloss(takeFrom)
-            print("You know have " + str(playerPlacements[player].calculateScoreloss()) + " negative points this round.")
+            print("You now have " + str(playerPlacements[player].calculateScoreloss()) + " negative points this round.")
             return
         inp = input("Location on placement mat: ")
         try:
@@ -163,14 +174,15 @@ def takeTurn(player):
             try:
                 if inpu == -1:
                     playerPlacements[player].addScoreloss(takeFrom)
-                    print("You know have " + str(playerPlacements[player].calculateScoreloss()) + " negative points this round.")
+                    print("You now have " + str(playerPlacements[player].calculateScoreloss()) + " negative points this round.")
                     return
                 takeFrom = playerPlacements[player].addTiles(takeFrom, inpu)
 
             except AssertionError:
                 print("You cannot place tiles on a full row, or a row that already has tiles of a different type!")
                 continue
-
+        except KeyboardInterrupt:
+            sys.exit(0)
         except:
             if inp.lower() == "q":
                 takeTurn(player)
@@ -240,5 +252,206 @@ def playGame():
     finalScoring()
     print(scores)
 
+### PYGAME STUFF
+## BEGIN
+clock = pygame.time.Clock()
+width = 1024
+height = 1024
+screen = None
+playingRound = False
+
+target = None
+selectedTiles = None
+
+def start_pygame():
+    global screen
+    pygame.init()
+
+    pygame.display.set_caption("Azul")
+    screen = pygame.display.set_mode([width, height])
+    pCount = 0
+    while not 4 >= pCount >= 2:
+        pstr = input("How many players: ")
+        try:
+            pCount = int(pstr)
+        except:
+            pass
+    setup(pCount)
+    center.loc = [width/2 - center.width/2, height/2 - 3 * center.tileBuffer]
+    setupFactoryLocations()
+    setupPlacementLocations()
+    event_loop()
+
+def setupFactoryLocations():
+    numFactories = len(factories)
+
+    dist = 200
+    delta = 2 * math.pi / numFactories
+    for i in range(numFactories):
+        factories[i].loc = [int(width/2 + dist * math.cos(delta * i)), int(height/2 - dist * math.sin(delta * i))]
+
+def setupPlacementLocations():
+    numPlacements = len(playerPlacements)
+
+    delta = width / (numPlacements)
+    y = height - int(7.5 * Placement.tileBuffer)
+    for i in range(numPlacements):
+        playerPlacements[i].loc = [int(delta * i + 0.5 * Placement.tileBuffer), y]
+
+def draw():
+    global target
+    screen.fill((0,0,0))
+    if target == None:
+        center.draw(screen)
+        for f in factories:
+            f.draw(screen)
+        for p in playerPlacements:
+            p.draw(screen)
+    else:
+        # This is where I would also upscale the target to be really big so it would be easy to select tiles
+        target.draw(screen)
+    # print("Attempting to draw!")
+    pygame.display.flip()
+    # Eventually add the board and placements
+
+def event_loop():
+    global playingRound
+    global selectedTiles
+    global target
+    while True:
+        # Or maybe it would be better to just draw a black box over the player and go from there?
+        draw()
+        pygame.display.flip()
+        if not checkEnd():
+            if not playingRound:
+                roundStart()
+                activePlayer = center.startingPlayer
+                playingRound = True
+            if (len(center.tiles) != 0 or not factoriesEmpty() or selectedTiles != None) and playingRound:
+                draw()
+                pygame.display.flip()
+                # if activePlayer != 0:
+                #     # takeAITurn(activePlayer)
+                #     takeTurn(activePlayer)
+                # else:
+                #     takeTurn(activePlayer)
+                # # clock.tick(30)
+                # activePlayer = (activePlayer + 1) % len(playerBoards)
+            else:
+                playingRound = False
+                # The round is over now. Score everything and reset the round for the next round
+                # scores[center.startingPlayer] -= 1
+                playerPlacements[center.startingPlayer].addScoreloss([1])
+                for i in range(len(playerPlacements)):
+                    scores[i] -= playerPlacements[i].calculateScoreloss()
+                    tiles = playerPlacements[i].moveTiles()
+                    playerPlacements[i].discardTiles(Bag, tiles)
+                    score = playerBoards[i].scoreBoard(tiles)
+                    scores[i] += score
+                # Things are scored. Now reset for the next round.
+                resetForRound()
+                print("The scores are now: ")
+                for p in range(len(scores)):
+                    print("Player", p, "has score:", scores[p])
+        else:
+            finalScoring()
+            print(scores)
+
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                sys.exit(0)
+            if event.type == KEYDOWN:
+                if event.key == K_q:
+                    raise TypeError("Time to quit!")
+            if event.type == MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+                # Test to see if the mouse is within any of the factories
+                if center.rect.collidepoint(pos):
+                    if target == center:
+                        # Need to check to see if I hit a tile, if so, add it!
+                        for t in target.tiles:
+                            if t.rect.collidepoint(pos):
+                                selectedTiles = target.take(t.value, activePlayer)
+                                # Where would you like to place said tiles?
+                                target = playerPlacements[activePlayer]
+                                if not target.possiblePlacemat(selectedTiles):
+                                    # Can't place the tiles anywhere
+                                    target.addScoreloss(selectedTiles)
+                                    # Move to next player
+                                    target = None
+                                    selectedTiles = None
+                                    activePlayer = (activePlayer + 1) % len(playerBoards)
+                                break
+                        if target == center:
+                            target = None
+                    else:
+                        target = center
+                else:
+                    if target is None:
+                        for f in factories:
+                            if Util.dist(pos, f.loc) < f.radius:
+                                target = f
+                                break
+                    elif type(target) is Factory:
+                        for t in target.tiles:
+                            if t.rect.collidepoint(pos):
+                                # Select this tile!
+                                selectedTiles = target.take(t.value, center)
+                                # Where would you like to place said tiles?
+                                target = playerPlacements[activePlayer]
+                                if not target.possiblePlacemat(selectedTiles):
+                                    # Can't place the tiles anywhere
+                                    target.addScoreloss(selectedTiles)
+                                    # Move to next player
+                                    target = None
+                                    selectedTiles = None
+                                    activePlayer = (activePlayer + 1) % len(playerBoards)
+                                break
+                        if selectedTiles == None:
+                            target = None
+                    if target is None:
+                        for p in playerPlacements:
+                            if p.rect.collidepoint(pos):
+                                target = p
+                                break
+                    elif type(target) == Placement and selectedTiles != None:
+                        # Check for selection of row to determine where to place the tiles!
+                        for row in range(len(target.placements)+1):
+                            low = (row + 1) * target.tileBuffer + target.loc[1] - Tile.width / 2
+                            up = (row + 1) * target.tileBuffer + target.loc[1] + Tile.width / 2
+                            if pos[1] >= low and pos[1] <= up:
+                                # Then row is the selected row!
+                                if row == 5:
+                                    # This handles intentional throwaway
+                                    target.addScoreloss(selectedTiles)
+                                    selectedTiles = []
+                                    break
+                                try:
+                                    selectedTiles = target.addTiles(selectedTiles, row)
+                                except AssertionError as e:
+                                    # This means that the player tried to add the tiles to a row that already had tiles
+                                    # Or an invalid row
+                                    # Or the row already contains different colored tiles
+                                    # Or the row has a completed tile of the same type
+                                    break
+                                # Confirm that nothing is impossible
+                                if len(selectedTiles) != 0 and not target.possiblePlacemat(selectedTiles):
+                                    # Can't place the tiles anywhere
+                                    target.addScoreloss(selectedTiles)
+                                    # Move to next player
+                                    target = None
+                                    selectedTiles = None
+                                    activePlayer = (activePlayer + 1) % len(playerBoards)
+                        if len(selectedTiles) == 0:
+                            # Move to next player
+                            target = None
+                            selectedTiles = None
+                            activePlayer = (activePlayer + 1) % len(playerBoards)
+                    elif type(target) == Placement:
+                        target = None
+                    elif target == center:
+                        target = None
+
 if __name__ == "__main__":
-    playGame()
+    # playGame()
+    start_pygame()

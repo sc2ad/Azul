@@ -1,14 +1,22 @@
 from Tile import Tile
 from Center import Center
+import pygame
 
 returningSets = False
 
 class Factory:
     def __init__(self, tiles):
         self.tiles = tiles
+        self.loc = [0,0] # Center
+        self.radius = 50
     def addTiles(self, tiles):
-        assert len(tiles) == 4, "Can only add 4 tiles to a factory!"
+        # assert len(tiles) == 4, "Can only add 4 tiles to a factory!"
         self.tiles = tiles
+        for i in range(len(self.tiles)):
+            t = self.tiles[i]
+            x = self.loc[0] - self.radius/3 + 2 * self.radius/3 * (i % 2)
+            y = self.loc[1] - self.radius/3 + 2 * self.radius/3 * (i // 2)
+            t.loc = [x, y]
     def take(self, tileValue, center):
         """Returns a list of Tiles of the given value
         And places the rest of the tiles into the Center
@@ -40,3 +48,11 @@ class Factory:
         if returningSets:
             return set(a)
         return a
+    def draw(self, screen):
+        try:
+            pygame.draw.circle(screen, (255,255,255), self.loc, self.radius, 3)
+            for t in self.tiles:
+                t.draw(screen)
+        except Exception:
+            # Pygame either doesn't exist or isn't set up properly.
+            print("Pygame not loaded, ignoring!")
