@@ -68,7 +68,7 @@ class Board:
         self.board[row][getIndex(row, tile)] = tile
         self.updateTileLocation(tile, row)
     def updateTileLocation(self, tile, row):
-        tile.loc = [(row + 1) * self.tileBuffer + self.loc[0], (getIndex(row, tile) + 1) * self.tileBuffer + self.loc[1]]
+        tile.loc = [(getIndex(row, tile) + 1) * self.tileBuffer + self.loc[0], (row + 1) * self.tileBuffer + self.loc[1]]
     def completedRowCount(self):
         """Returns the completed number of rows of this board
         """

@@ -104,7 +104,7 @@ class Placement:
                 self.placements[i][:len(self.placements[i])-1] = [None for _ in range(len(self.placements[i]))]
         tileBag.addToDiscard([item for item in self.lossTiles if type(item) == Tile])
         self.lossTiles = []
-        # self.reset()
+        self.reset()
     def addScoreloss(self, tiles):
         # Need to discard the tiles that are extra back into the bag after calculating the score adjustment!
         # Otherwise the bag just loses tiles when players put them into the scoreloss zone

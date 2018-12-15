@@ -262,6 +262,7 @@ playingRound = False
 
 target = None
 selectedTiles = None
+activePlayer = 0
 
 def start_pygame():
     global screen
@@ -321,6 +322,10 @@ def draw():
     else:
         # This is where I would also upscale the target to be really big so it would be easy to select tiles
         target.draw(screen)
+        if type(target) == Placement or type(target) == Board:
+            if target == playerPlacements[activePlayer] or target == playerBoards[activePlayer]:
+                playerPlacements[activePlayer].draw(screen)
+                playerBoards[activePlayer].draw(screen)
     # print("Attempting to draw!")
     pygame.display.flip()
     # Eventually add the board and placements
@@ -329,6 +334,7 @@ def event_loop():
     global playingRound
     global selectedTiles
     global target
+    global activePlayer
     while True:
         # Or maybe it would be better to just draw a black box over the player and go from there?
         draw()
