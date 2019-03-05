@@ -27,7 +27,7 @@ public class Tile implements AzulDrawable {
     }
     public Tile() {
         // Placeholder constructor for STARTING_TILE
-        value = -1;
+        this(TileName.STARTING_TILE);
     }
 
     public int getValue() {

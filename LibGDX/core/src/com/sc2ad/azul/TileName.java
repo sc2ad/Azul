@@ -8,7 +8,8 @@ public enum TileName {
     YELLOW(1, Color.YELLOW),
     RED(2, Color.RED),
     BLACK(3, Color.BLACK),
-    TEAL(4, Color.TEAL);
+    TEAL(4, Color.TEAL),
+    STARTING_TILE(-1, Color.WHITE);
 
     private Texture texture;
     private int value;

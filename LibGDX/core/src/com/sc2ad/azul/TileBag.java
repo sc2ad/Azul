@@ -22,6 +22,9 @@ public class TileBag extends TileCollection {
         discard.clear();
         for (int i = 0; i < TILE_COUNT; i++) {
             for (int j = 0; j < TileName.values().length; j++) {
+                if (TileName.values()[j].getValue() < 0) {
+                    continue;
+                }
                 tiles.add(new Tile(TileName.values()[j]));
             }
         }
