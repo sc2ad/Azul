@@ -60,6 +60,7 @@ public class AzulGame {
 //            players.get(i).placement.setPos((float) (delta * i + 0.5 * (Tile.WIDTH + 5)), y);
 //            players.get(i).board.setPos((float) (delta * i + 8 * Board.TILE_BUFFER), y);
         }
+        center.setCenterPos(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
     }
 
     public void startRound() {
