@@ -13,8 +13,8 @@ public class AzulGame {
     private final static int FACTORY_INITIAL_COUNT = 4;
 
     // TODO Make these the variables that actually correspond to the screen (using Azul)
-    private final static int WINDOW_WIDTH = 1024;
-    private final static int WINDOW_HEIGHT = 768;
+    private final static int WINDOW_WIDTH = 2048;
+    private final static int WINDOW_HEIGHT = 768*2;
     private final static int FACTORY_RADIUS = 200;
 
     private Center center;
@@ -49,15 +49,16 @@ public class AzulGame {
         // Factory locations
         double delta = 2 * Math.PI / factories.size();
         for (int i = 0; i < factories.size(); i++) {
-            factories.get(i).setPos((float) (WINDOW_WIDTH / 2 + FACTORY_RADIUS * Math.cos(delta * i)), (float) (WINDOW_HEIGHT / 2 - FACTORY_RADIUS * Math.sin(delta * i)));
+            factories.get(i).setPos((float) (WINDOW_WIDTH / 2 + FACTORY_RADIUS * Math.cos(delta * i)) - Factory.RADIUS, (float) (WINDOW_HEIGHT / 2 - FACTORY_RADIUS * Math.sin(delta * i)) - Factory.RADIUS);
         }
         // Placement locations
         delta = (double) WINDOW_WIDTH / (double) players.size();
         //TODO Make this use a Constants.something instead!
         float y = (float) (WINDOW_HEIGHT - 7.5 * (Tile.WIDTH + 5));
         for (int i = 0; i < players.size(); i++) {
-            players.get(i).placement.setPos((float) (delta * i + 0.5 * (Tile.WIDTH + 5)), y);
-            players.get(i).board.setPos((float) (delta * i + 8 * Board.TILE_BUFFER), y);
+            players.get(i).setPos((float) (delta * i + 0.5 * (Tile.WIDTH + 5)), y);
+//            players.get(i).placement.setPos((float) (delta * i + 0.5 * (Tile.WIDTH + 5)), y);
+//            players.get(i).board.setPos((float) (delta * i + 8 * Board.TILE_BUFFER), y);
         }
     }
 

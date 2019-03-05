@@ -10,13 +10,15 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 public class Placement implements AzulDrawable {
-    private static final int WIDTH = 100;
-    private static final int HEIGHT = 200;
+    private static final int WIDTH = 150;
     private static final int ROWS = 5;
+    private static final int HEIGHT = (Tile.HEIGHT + 5) * (ROWS + 1);
+
     private Sprite sprite;
 
     private PlacementRow[] rows;
     private LinkedList<Tile> lossTiles;
+    private Sprite scoreLossZone;
     private int loss;
 
     private class PlacementRow extends TileCollection implements AzulDrawable {
@@ -29,7 +31,8 @@ public class Placement implements AzulDrawable {
         public PlacementRow(int length) {
             sprite = new Sprite(new Texture("whitebox.png"), length * TILE_BUFFER, HEIGHT);
             //TODO CHANGE FOLLOWING LINE
-            sprite.setColor(Color.CLEAR);
+//            sprite.setColor(Color.CLEAR);
+            sprite.setColor(Color.WHITE);
             tiles = new LinkedList<Tile>();
             this.length = length;
         }
@@ -79,7 +82,7 @@ public class Placement implements AzulDrawable {
             Iterator<Tile> iter = tiles.iterator();
             int index = 0;
             while (iter.hasNext()) {
-                iter.next().setPos((index + 1) * TILE_BUFFER + sprite.getX(), length * TILE_BUFFER + sprite.getY());
+                iter.next().setCenterPos((index + 1) * TILE_BUFFER + getCenterX(), length * TILE_BUFFER + getCenterY());
                 index++;
             }
         }
@@ -104,6 +107,9 @@ public class Placement implements AzulDrawable {
         sprite = new Sprite(new Texture("whitebox.png"), WIDTH, HEIGHT);
         //TODO CHANGE THIS LINE
         sprite.setColor(Color.CLEAR);
+        scoreLossZone = new Sprite(new Texture("whitebox.png"), WIDTH, Tile.HEIGHT + 5);
+        //TODO CHANGE THIS LINE
+        scoreLossZone.setColor(Color.CLEAR);
         rows = new PlacementRow[ROWS];
         for (int i = 0; i < rows.length; i++) {
             rows[i] = new PlacementRow(i+1);
@@ -187,6 +193,15 @@ public class Placement implements AzulDrawable {
         }
     }
     @Override
+    public void setPos(float newX, float newY) {
+        // Set the pos of the current sprite and the children
+        sprite.setPosition(newX, newY);
+        for (int i = 0; i < rows.length; i++) {
+            rows[i].setPos(sprite.getX(), -(i + 1) * PlacementRow.HEIGHT + sprite.getY() + sprite.getHeight());
+        }
+        scoreLossZone.setPosition(newX, newY);
+    }
+    @Override
     public Sprite getSprite() {
         return sprite;
     }
@@ -198,5 +213,7 @@ public class Placement implements AzulDrawable {
         for (PlacementRow r : rows) {
             r.draw(batch);
         }
+        // Draw scorelosszone
+        scoreLossZone.draw(batch);
     }
 }

@@ -24,8 +24,8 @@ public class Azul extends ApplicationAdapter {
 		game.startRound();
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
-		camera = new OrthographicCamera(1000, 1000 * (h / w));
-		camera.position.set(500, 384, 0);
+		camera = new OrthographicCamera(w, w * (h / w));
+		camera.position.set(w/2, h/2, 0);
 		camera.update();
 		batch = new SpriteBatch();
 		font = new BitmapFont();
@@ -38,7 +38,7 @@ public class Azul extends ApplicationAdapter {
 		camera.update();
 		batch.setProjectionMatrix(camera.combined);
 
-		Gdx.gl.glClearColor(1, 1, 1, 1);
+//		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		batch.begin();
 		game.draw(batch);

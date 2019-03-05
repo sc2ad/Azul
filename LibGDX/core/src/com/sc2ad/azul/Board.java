@@ -10,19 +10,22 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Board implements AzulDrawable {
-    private static final int WIDTH = 200;
-    private static final int HEIGHT = 200;
     private static final int ROWS = 5;
     private static final int COLUMNS = 5;
 
     public static final int TILE_BUFFER = 25;
+
+    private static final int WIDTH = ROWS * TILE_BUFFER;
+    private static final int HEIGHT = COLUMNS * TILE_BUFFER;
+
     private Sprite sprite;
     private Tile[][] board;
 
     public Board() {
         sprite = new Sprite(new Texture("whitebox.png"), WIDTH, HEIGHT);
         // TODO CHANGE THE NEXT LINE
-        sprite.setColor(Color.CLEAR);
+//        sprite.setColor(Color.CLEAR);
+        sprite.setColor(Color.WHITE);
         board = new Tile[ROWS][COLUMNS];
     }
     public int scoreTile(int row, int index) {
@@ -140,7 +143,7 @@ public class Board implements AzulDrawable {
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLUMNS; j++) {
                 if (board[i][j] != null) {
-                    board[i][j].setPos(getIndex(i, board[i][j]) * TILE_BUFFER + sprite.getX(), (i + 1) * TILE_BUFFER + sprite.getY());
+                    board[i][j].setCenterPos(getIndex(i, board[i][j]) * TILE_BUFFER + sprite.getX(), (i + 1) * TILE_BUFFER + sprite.getY());
                 }
             }
         }

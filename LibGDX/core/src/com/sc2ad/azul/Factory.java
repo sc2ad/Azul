@@ -10,7 +10,7 @@ import java.util.*;
 
 public class Factory extends TileCollection implements AzulDrawable {
     private static final int MAX_TILES = 4;
-    private static final float RADIUS = 50;
+    public static final float RADIUS = 50;
 
     private Sprite sprite;
 
@@ -18,7 +18,8 @@ public class Factory extends TileCollection implements AzulDrawable {
         this.tiles = tiles;
         sprite = new Sprite(new Texture("whitebox.png"));
         // TODO CHANGE THIS LINE
-        sprite.setColor(Color.CLEAR);
+//        sprite.setColor(Color.CLEAR);
+        sprite.setSize(2 * RADIUS, 2 * RADIUS);
     }
 
     public Tile[] take(TileName tileName, TileCollection center) {
@@ -30,7 +31,7 @@ public class Factory extends TileCollection implements AzulDrawable {
         Iterator<Tile> iter = tiles.iterator();
         int index = 0;
         while (iter.hasNext()) {
-            iter.next().setPos(sprite.getX() - RADIUS / 3 + 2 * RADIUS / 3 * (index % 2), sprite.getY() - RADIUS / 3 + 2 * RADIUS / 3 * (index / 2));
+            iter.next().setCenterPos(getCenterX() - RADIUS / 3 + 2 * RADIUS / 3 * (index % 2), getCenterY() - RADIUS / 3 + 2 * RADIUS / 3 * (index / 2));
             index++;
         }
     }
