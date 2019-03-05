@@ -5,10 +5,11 @@ import java.util.LinkedList;
 
 //TODO IMPLEMENTS AZULDRAWABLE
 public class TileBag extends TileCollection {
+    public static TileBag Instance = new TileBag();
     private final static int TILE_COUNT = 20;
 
     private LinkedList<Tile> discard;
-    public TileBag() {
+    private TileBag() {
         discard = new LinkedList<Tile>();
         reset();
     }
@@ -32,7 +33,7 @@ public class TileBag extends TileCollection {
      * @return
      */
     public Tile[] take(int count) {
-        return take(new TakeItem<>(count));
+        return take(new TakeItem<Integer, Object>(count));
     }
     public void addToDiscard(Collection<Tile> tiles) {
         if (tiles.contains(Tile.STARTING_TILE)) {

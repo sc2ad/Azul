@@ -45,20 +45,13 @@ public class Placement implements AzulDrawable {
             return tiles.iterator().next().getName();
         }
 
-        public Tile[] take() {
-            return take(new TakeItem<>(0));
-        }
-
         public boolean possiblePlacement() {
             return length == tiles.size();
         }
 
         @Override
         public Tile[] take(TakeItem item) {
-            TakeItem<Integer, Object> it = (TakeItem<Integer, Object>) item;
-            if (it.t == 0) {
-                // Remove items
-            }
+            reset();
             return new Tile[0];
         }
 
@@ -148,6 +141,7 @@ public class Placement implements AzulDrawable {
         if (rows[row].possiblePlacement() && tiles.iterator().next().getName().equals(rows[row].getTileType())) {
             rows[row].addTiles(tiles);
         }
+        updateTileLocations();
     }
     public Tile[] moveTiles() {
         Tile[] out = new Tile[ROWS];
@@ -186,6 +180,11 @@ public class Placement implements AzulDrawable {
             }
         }
         return loss;
+    }
+    public void updateTileLocations() {
+        for (PlacementRow r : rows) {
+            r.updateTileLocations();
+        }
     }
     @Override
     public Sprite getSprite() {

@@ -10,9 +10,9 @@ public class Player implements AzulDrawable {
     private static final int HEIGHT = 300;
     private String name;
     private int id;
-    private Placement placement;
-    private Board board;
-    private int score;
+    public Placement placement;
+    public Board board;
+    public int score;
     private Sprite sprite;
 
     public Player(String name, int id) {
@@ -21,6 +21,8 @@ public class Player implements AzulDrawable {
         sprite = new Sprite(new Texture("whitebox.png"), WIDTH, HEIGHT);
         //TODO CHANGE THIS LINE
         sprite.setColor(Color.CLEAR);
+        placement = new Placement();
+        board = new Board();
     }
     @Override
     public Sprite getSprite() {
@@ -28,8 +30,11 @@ public class Player implements AzulDrawable {
     }
     @Override
     public void draw(Batch batch) {
+        // Draw border for player
+        sprite.draw(batch);
+        // Draw placement, board
         placement.draw(batch);
         board.draw(batch);
-        // Draw score on the top, along with name
+        // TODO Draw score on the top, along with name
     }
 }

@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 public class Center extends TileCollection implements AzulDrawable {
+    public static Center Instance = new Center();
     private static final int WIDTH = 200;
     private static final int TILE_COUNT = 25;
     private static final int TILE_WIDTH = (WIDTH - TILE_COUNT) / TILE_COUNT;
@@ -19,7 +20,7 @@ public class Center extends TileCollection implements AzulDrawable {
 
     private Sprite sprite;
 
-    public Center() {
+    private Center() {
         tiles = new LinkedList<Tile>();
         sprite = new Sprite(new Texture("whitebox.png"), WIDTH, TILE_WIDTH * 2);
         //TODO CHANGE THIS LINE
@@ -31,14 +32,14 @@ public class Center extends TileCollection implements AzulDrawable {
         startingTaken = false;
     }
     public Tile[] take(TileName tileName, Player player) {
-        return take(new TakeItem<>(tileName, player));
+        return take(new TakeItem<TileName, Player>(tileName, player));
     }
 
     @Override
     public Tile[] take(TakeItem item) {
         TakeItem<TileName, Player> it = (TakeItem<TileName, Player>) item;
-        LinkedList<Tile> out = new LinkedList<>();
-        LinkedList<Tile> temp = new LinkedList<>();
+        LinkedList<Tile> out = new LinkedList<Tile>();
+        LinkedList<Tile> temp = new LinkedList<Tile>();
         Iterator<Tile> iter = tiles.iterator();
         while (iter.hasNext()) {
             Tile t = iter.next();

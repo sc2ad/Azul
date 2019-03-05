@@ -6,10 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 
 public class Factory extends TileCollection implements AzulDrawable {
     private static final int MAX_TILES = 4;
@@ -25,7 +22,7 @@ public class Factory extends TileCollection implements AzulDrawable {
     }
 
     public Tile[] take(TileName tileName, TileCollection center) {
-        return take(new TakeItem<>(tileName, center));
+        return take(new TakeItem<TileName, TileCollection>(tileName, center));
     }
 
     @Override
@@ -43,7 +40,7 @@ public class Factory extends TileCollection implements AzulDrawable {
         if (tiles.size() > MAX_TILES) {
             return;
         }
-        this.tiles = tiles;
+        this.tiles = new ArrayList<Tile>(tiles);
         updateTileLocations();
     }
 
