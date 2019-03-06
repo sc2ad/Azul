@@ -57,10 +57,16 @@ public class AzulGame {
         float y = (float) (WINDOW_HEIGHT - 7.5 * (Tile.WIDTH + 5));
         for (int i = 0; i < players.size(); i++) {
             players.get(i).setPos((float) (delta * i + 0.5 * (Tile.WIDTH + 5)), y);
-//            players.get(i).placement.setPos((float) (delta * i + 0.5 * (Tile.WIDTH + 5)), y);
-//            players.get(i).board.setPos((float) (delta * i + 8 * Board.TILE_BUFFER), y);
         }
         center.setCenterPos(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
+    }
+
+    public void focusPlayer(int value) {
+        for (Player p : players) {
+            if (p.getValue() == value) {
+                CameraWrapper.Instance.focusCamera(p);
+            }
+        }
     }
 
     public void startRound() {

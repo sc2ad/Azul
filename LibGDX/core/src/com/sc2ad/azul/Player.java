@@ -35,6 +35,9 @@ public class Player implements AzulDrawable {
         nameFont = new BitmapFont();
         scoreFont = new BitmapFont();
     }
+    public int getValue() {
+        return id;
+    }
     @Override
     public Sprite getSprite() {
         return sprite;

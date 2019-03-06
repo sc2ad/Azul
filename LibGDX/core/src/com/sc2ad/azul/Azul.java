@@ -13,7 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class Azul extends ApplicationAdapter {
 	SpriteBatch batch;
 	private AzulGame game;
-	private OrthographicCamera camera;
+	private CameraWrapper camera;
 	private BitmapFont font;
 	
 	@Override
@@ -24,9 +24,7 @@ public class Azul extends ApplicationAdapter {
 		game.startRound();
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
-		camera = new OrthographicCamera(w, w * (h / w));
-		camera.position.set(w/2, h/2, 0);
-		camera.update();
+		camera = CameraWrapper.CreateCamera(w, h);
 		batch = new SpriteBatch();
 		font = new BitmapFont();
 		font.setColor(Color.RED);
@@ -36,35 +34,41 @@ public class Azul extends ApplicationAdapter {
 	public void render () {
 		handleInput();
 		camera.update();
-		batch.setProjectionMatrix(camera.combined);
+		batch.setProjectionMatrix(camera.getCamera().combined);
 
 //		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		batch.begin();
 		game.draw(batch);
-		font.draw(batch, "Camera: " + camera.position, 10, 10);
+		font.draw(batch, "Camera: " + camera.getCamera().position, 10, 10);
 		batch.end();
 	}
 
 	public void handleInput() {
 		// https://github.com/libgdx/libgdx/wiki/Orthographic-camera
 		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-			camera.translate(-3, 0, 0);
+			camera.getCamera().translate(-3, 0, 0);
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-			camera.translate(0, 3, 0);
+			camera.getCamera().translate(0, 3, 0);
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-			camera.translate(3, 0, 0);
+			camera.getCamera().translate(3, 0, 0);
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-			camera.translate(0, -3, 0);
+			camera.getCamera().translate(0, -3, 0);
+		}
+		if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
+			camera.focusCamera(null);
+		}
+		if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+			game.focusPlayer(0);
 		}
 	}
 
 	@Override
 	public void resize(int width, int height) {
-//		camera.viewportHeight *= (height / width);
+//		camera.getCamera().viewportHeight *= (height / width);
 //		camera.update();
 	}
 	

@@ -1,4 +1,4 @@
-package com.sc2ad.azul;
+package com.sc2ad.azul.util;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
