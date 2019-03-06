@@ -1,11 +1,13 @@
 package com.sc2ad.azul;
 
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 
-public class AzulGame {
+public class AzulGameScreen implements Screen {
     private final static int EXTRA_FACTORY_COUNT = 2;
     private final static int COMPLETED_ROW_BONUS = 2;
     private final static int COMPLETED_COLUMN_BONUS = 7;
@@ -15,12 +17,20 @@ public class AzulGame {
     // TODO Make these the variables that actually correspond to the screen (using Azul)
     private final static int WINDOW_WIDTH = 2048;
     private final static int WINDOW_HEIGHT = 768*2;
-    private final static int FACTORY_RADIUS = 200;
+    private final static int FACTORY_RADIUS = 150;
 
     private Center center;
     private LinkedList<Player> players;
     private LinkedList<Factory> factories;
     private TileBag bag;
+
+    private Azul game;
+    private boolean paused;
+    private boolean showing;
+
+    public AzulGameScreen(Azul game) {
+        this.game = game;
+    }
 
     /**
      * Sets up the game using default naming convention:
@@ -94,22 +104,61 @@ public class AzulGame {
         return false;
     }
 
-    public void draw(Batch batch) {
-        for (Player p : players) {
-            p.draw(batch);
-        }
-        for (Factory f : factories) {
-            f.draw(batch);
-        }
-        center.draw(batch);
-        //TODO Maybe add drawing for TileBag, other stuff?
-    }
-
     public void finalScoring() {
         for (Player p : players) {
             p.score += p.board.completedRowCount() * COMPLETED_ROW_BONUS;
             p.score += p.board.completedColumnCount() * COMPLETED_COLUMN_BONUS;
             p.score += p.board.completedAllCellsCount() * COMPLETED_ALL_CELL_BONUS;
         }
+    }
+
+    @Override
+    public void show() {
+        showing = true;
+    }
+
+    @Override
+    public void render(float delta) {
+        SpriteBatch batch = game.batch;
+        batch.begin();
+        if (showing) {
+            for (Player p : players) {
+                p.draw(batch);
+            }
+            for (Factory f : factories) {
+                f.draw(batch);
+            }
+            center.draw(batch);
+            //TODO Maybe add drawing for TileBag, other stuff?
+            //TODO Add input handling for AzulGameScreen (only when not paused?)
+        }
+        batch.end();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+
+    }
+
+    @Override
+    public void pause() {
+        paused = true;
+        //TODO Add a dialog box indicating the game is paused?
+    }
+
+    @Override
+    public void resume() {
+        paused = false;
+        //TODO nothing? Simply called when the dialog box is closed successfully?
+    }
+
+    @Override
+    public void hide() {
+        showing = false;
+    }
+
+    @Override
+    public void dispose() {
+        // Nothing to do here
     }
 }
