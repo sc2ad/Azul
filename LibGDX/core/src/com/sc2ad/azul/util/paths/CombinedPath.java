@@ -188,7 +188,6 @@ public class CombinedPath implements MotionPath {
 
     @Override
     public boolean validate() {
-        //TODO ADD ERROR CHECKS
         return true;
     }
 }

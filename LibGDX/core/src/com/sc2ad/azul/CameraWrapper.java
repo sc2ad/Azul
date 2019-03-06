@@ -97,6 +97,14 @@ public class CameraWrapper {
      * @param drawable
      */
     public void focusCamera(AzulDrawable drawable) {
+        if (drawable == currentTarget) {
+            // Can't focus on the same target twice!
+            return;
+        }
+        if (panningToTarget || zooming) {
+            // Can't focus while focusing on something else!
+            return;
+        }
         panStartTime = System.nanoTime();
         zoomStartTime = System.nanoTime();
         if (drawable == null) {

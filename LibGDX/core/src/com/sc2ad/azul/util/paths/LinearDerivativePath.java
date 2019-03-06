@@ -11,10 +11,6 @@ public class LinearDerivativePath implements MotionPath {
     @SuppressWarnings("javadoc")
     private double velStart,velEnd,accel,distance,totalTime;
 
-    /*
-     * TODO SIMPLIFY THIS FILE TO USE INTEGRALPATH WITH HOLD
-     */
-
     /**
      * Large constructor, useful if everything (except time) is known.
      *
@@ -101,7 +97,6 @@ public class LinearDerivativePath implements MotionPath {
     }
     @Override
     public boolean validate() {
-        //TODO if x==predicted x, v==pred v, a==preda
         return true;
     }
 }

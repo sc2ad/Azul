@@ -56,7 +56,6 @@ public class Hold implements MotionPath {
     }
 
     public boolean validate() {
-        // TODO this prob needs no false validate tho
         return true;
     }
 

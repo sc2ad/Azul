@@ -12,7 +12,7 @@ import java.util.LinkedList;
 public class Center extends TileCollection implements AzulDrawable {
     public static Center Instance = new Center();
     private static final int TILE_COUNT = 10;
-    private static final int WIDTH = 10 * Board.TILE_BUFFER;
+    private static final int WIDTH = TILE_COUNT * Board.TILE_BUFFER;
     private static final int TILE_HEIGHT = Board.TILE_BUFFER;
 
     private Player startingPlayer;
