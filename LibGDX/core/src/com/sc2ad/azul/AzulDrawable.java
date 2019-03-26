@@ -2,9 +2,19 @@ package com.sc2ad.azul;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 
 public interface AzulDrawable {
     Sprite getSprite();
+
+    default Actor getActor() {
+        //TODO Fix this somehow
+        Actor a = new Actor();
+        a.setPosition(getSprite().getX(), getSprite().getY());
+        a.setSize(getSprite().getWidth(), getSprite().getHeight());
+        return a;
+    }
+
     default void draw(Batch batch) {
         getSprite().draw(batch);
     }

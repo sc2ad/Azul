@@ -1,8 +1,19 @@
-package com.sc2ad.azul;
+package com.sc2ad.azul.screens;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.sc2ad.azul.*;
+import com.sc2ad.azul.listeners.CenterListener;
+import com.sc2ad.azul.listeners.FactoryListener;
+import com.sc2ad.azul.listeners.PlayerListener;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -23,13 +34,20 @@ public class AzulGameScreen implements Screen {
     private LinkedList<Player> players;
     private LinkedList<Factory> factories;
     private TileBag bag;
+    protected Stage stage;
 
-    private Azul game;
+    private SpriteBatch batch;
+    private FitViewport viewport;
     private boolean paused;
     private boolean showing;
 
-    public AzulGameScreen(Azul game) {
-        this.game = game;
+    public AzulGameScreen() {
+        viewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), CameraWrapper.Instance.getCamera());
+        viewport.apply();
+
+        CameraWrapper.Instance.update();
+        batch = new SpriteBatch();
+        stage = new Stage(viewport, batch);
     }
 
     /**
@@ -60,6 +78,10 @@ public class AzulGameScreen implements Screen {
         double delta = 2 * Math.PI / factories.size();
         for (int i = 0; i < factories.size(); i++) {
             factories.get(i).setPos((float) (WINDOW_WIDTH / 2 + FACTORY_RADIUS * Math.cos(delta * i)) - Factory.RADIUS, (float) (WINDOW_HEIGHT / 2 - FACTORY_RADIUS * Math.sin(delta * i)) - Factory.RADIUS);
+
+            Actor f = factories.get(i).getActor();
+            f.addListener(new FactoryListener(factories.get(i), this));
+            stage.addActor(f);
         }
         // Placement locations
         delta = (double) WINDOW_WIDTH / (double) players.size();
@@ -67,8 +89,16 @@ public class AzulGameScreen implements Screen {
         float y = (float) (WINDOW_HEIGHT - 7.5 * (Tile.WIDTH + 5));
         for (int i = 0; i < players.size(); i++) {
             players.get(i).setPos((float) (delta * i + 0.5 * (Tile.WIDTH + 5)), y);
+
+            Actor p = players.get(i).getActor();
+            p.addListener(new PlayerListener(players.get(i), this));
+            stage.addActor(p);
         }
-        center.setCenterPos(WINDOW_WIDTH/2, WINDOW_HEIGHT/2);
+        center.setCenterPos(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
+
+        Actor c = center.getActor();
+        c.addListener(new CenterListener(center, this));
+        stage.addActor(c);
     }
 
     public void focusPlayer(int value) {
@@ -115,11 +145,16 @@ public class AzulGameScreen implements Screen {
     @Override
     public void show() {
         showing = true;
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override
     public void render(float delta) {
-        SpriteBatch batch = game.batch;
+        handleInput();
+        Gdx.gl.glClearColor(0, .12f, .16f, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        batch.setProjectionMatrix(CameraWrapper.Instance.getCamera().combined);
+
         batch.begin();
         if (showing) {
             for (Player p : players) {
@@ -133,11 +168,29 @@ public class AzulGameScreen implements Screen {
             //TODO Add input handling for AzulGameScreen (only when not paused?)
         }
         batch.end();
+        CameraWrapper.Instance.update();
+
+        stage.act();
+        stage.draw();
     }
 
     @Override
     public void resize(int width, int height) {
+        viewport.update(width, height);
+        CameraWrapper.Instance.getPosition().set(CameraWrapper.Instance.getCamera().viewportWidth / 2, CameraWrapper.Instance.getCamera().viewportHeight / 2, 0);
+        CameraWrapper.Instance.update();
+    }
 
+    private void handleInput() {
+        if (paused) {
+            return;
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
+            CameraWrapper.Instance.focusCamera(null);
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+            focusPlayer(0);
+        }
     }
 
     @Override
@@ -155,10 +208,12 @@ public class AzulGameScreen implements Screen {
     @Override
     public void hide() {
         showing = false;
+        Gdx.input.setInputProcessor(null);
     }
 
     @Override
     public void dispose() {
-        // Nothing to do here
+        batch.dispose();
+        stage.dispose();
     }
 }

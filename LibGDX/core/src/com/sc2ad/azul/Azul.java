@@ -7,19 +7,18 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.sc2ad.azul.screens.AzulGameScreen;
+import com.sc2ad.azul.screens.MainMenuScreen;
 
 public class Azul extends Game {
 	public SpriteBatch batch;
-	private AzulGameScreen game;
 	private CameraWrapper camera;
 	private BitmapFont font;
 	
 	@Override
 	public void create () {
-		game = new AzulGameScreen(this);
 		//TODO Change!
-		game.setup(2);
-		game.startRound();
+
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
 		camera = CameraWrapper.CreateCamera(w, h);
@@ -27,7 +26,7 @@ public class Azul extends Game {
 		font = new BitmapFont();
 		font.setColor(Color.RED);
 		//TODO Change!
-		setScreen(game);
+		setScreen(new MainMenuScreen(this));
 	}
 
 	@Override
@@ -57,12 +56,6 @@ public class Azul extends Game {
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
 			camera.getCamera().translate(0, -3, 0);
-		}
-		if (Gdx.input.isKeyJustPressed(Input.Keys.Z)) {
-			camera.focusCamera(null);
-		}
-		if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
-			game.focusPlayer(0);
 		}
 	}
 

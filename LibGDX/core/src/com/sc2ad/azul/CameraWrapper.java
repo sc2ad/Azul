@@ -152,4 +152,7 @@ public class CameraWrapper {
 
         camera.update();
     }
+    public Vector3 getPosition() {
+        return camera.position;
+    }
 }
