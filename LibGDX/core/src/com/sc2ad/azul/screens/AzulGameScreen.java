@@ -14,6 +14,7 @@ import com.sc2ad.azul.*;
 import com.sc2ad.azul.listeners.CenterListener;
 import com.sc2ad.azul.listeners.FactoryListener;
 import com.sc2ad.azul.listeners.PlayerListener;
+import com.sc2ad.azul.listeners.ResetListener;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -74,6 +75,12 @@ public class AzulGameScreen implements Screen {
     }
 
     private void setupLocations() {
+        // Setup background actor
+        Actor background = new Actor();
+        background.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        background.setPosition(0, 0);
+        background.addListener(new ResetListener());
+        stage.addActor(background);
         // Factory locations
         double delta = 2 * Math.PI / factories.size();
         for (int i = 0; i < factories.size(); i++) {
@@ -83,7 +90,7 @@ public class AzulGameScreen implements Screen {
             f.addListener(new FactoryListener(factories.get(i), this));
             stage.addActor(f);
         }
-        // Placement locations
+        // Player locations
         delta = (double) WINDOW_WIDTH / (double) players.size();
         //TODO Make this use a Constants.something instead!
         float y = (float) (WINDOW_HEIGHT - 7.5 * (Tile.WIDTH + 5));
